@@ -43,7 +43,7 @@ extension Image {
 @available(iOS 14.0, OSX 11.0, tvOS 13.0, watchOS 6.0, *)
 public struct KFImage: View {
 
-    var context: Context
+    @StateObject var context: Context = .init()
 
     /// Creates a Kingfisher compatible image view to load image from the given `Source`.
     /// - Parameter source: The image `Source` defining where to load the target image.
@@ -98,7 +98,7 @@ public struct KFImage: View {
     }
 
     init(binder: ImageBinder) {
-        self.context = Context(binder: binder)
+        self.context.binder = binder
     }
 
     public var body: some View {
@@ -124,14 +124,14 @@ public struct KFImage: View {
 
 @available(iOS 14.0, OSX 11.0, tvOS 13.0, watchOS 6.0, *)
 extension KFImage {
-    struct Context {
-        var binder: ImageBinder
+    class Context: ObservableObject {
+        var binder: ImageBinder!
         var configurations: [(Image) -> Image] = []
         var cancelOnDisappear: Bool = false
         var placeholder: AnyView? = nil
 
-        init(binder: ImageBinder) {
-            self.binder = binder
+        init() {
+            
         }
     }
 }
@@ -247,7 +247,7 @@ extension KFImage {
     /// - Parameter block: The block applies to loaded image.
     /// - Returns: A `KFImage` view that configures internal `Image` with `block`.
     public func configure(_ block: @escaping (Image) -> Image) -> KFImage {
-        var result = self
+        let result = self
         result.context.configurations.append(block)
         return result
     }
