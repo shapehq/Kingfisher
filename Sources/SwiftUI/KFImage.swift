@@ -56,24 +56,9 @@ public struct KFImage: View {
     ///               `KFImage` and configure the options through modifier instead. See methods of `KFOptionSetter`
     ///               for more.
     @available(*, deprecated, message: "Some options are not available in SwiftUI yet. Use `KFImage(source:isLoaded:)` to create a `KFImage` and configure the options through modifier instead.")
-    public init(source: Source?, options: KingfisherOptionsInfo? = nil, isLoaded: Binding<Bool> = .constant(false)) {
-        let binder = KFImage.ImageBinder(source: source, options: options, isLoaded: isLoaded)
+    public init(options: KingfisherOptionsInfo? = nil, isLoaded: Binding<Bool> = .constant(false)) {
+        let binder = KFImage.ImageBinder(source: nil, options: options, isLoaded: isLoaded)
         self.init(binder: binder)
-    }
-
-    /// Creates a Kingfisher compatible image view to load image from the given `URL`.
-    /// - Parameter url: The image URL from where to load the target image.
-    /// - Parameter options: The options should be applied when loading the image.
-    ///                      Some UIKit related options (such as `ImageTransition.flip`) are not supported.
-    /// - Parameter isLoaded: Whether the image is loaded or not. This provides a way to inspect the internal loading
-    ///                       state. `true` if the image is loaded successfully. Otherwise, `false`. Do not set the
-    ///                       wrapped value from outside.
-    /// - Deprecated: Some options are not available in SwiftUI yet. Use `KFImage(_:isLoaded:)` to create a
-    ///               `KFImage` and configure the options through modifier instead. See methods of `KFOptionSetter`
-    ///               for more.
-    @available(*, deprecated, message: "Some options are not available in SwiftUI yet. Use `KFImage(_:isLoaded:)` to create a `KFImage` and configure the options through modifier instead.")
-    init(_ url: URL?, options: KingfisherOptionsInfo? = nil, isLoaded: Binding<Bool> = .constant(false)) {
-        self.init(source: url?.convertToSource(), options: options, isLoaded: isLoaded)
     }
 
     /// Creates a Kingfisher compatible image view to load image from the given `Source`.
@@ -82,19 +67,9 @@ public struct KFImage: View {
     ///   - isLoaded: Whether the image is loaded or not. This provides a way to inspect the internal loading
     ///               state. `true` if the image is loaded successfully. Otherwise, `false`. Do not set the
     ///               wrapped value from outside.
-    public init(source: Source?, isLoaded: Binding<Bool> = .constant(false)) {
-        let binder = ImageBinder(source: source, isLoaded: isLoaded)
+    public init(isLoaded: Binding<Bool> = .constant(false)) {
+        let binder = ImageBinder(source: nil, isLoaded: isLoaded)
         self.init(binder: binder)
-    }
-
-    /// Creates a Kingfisher compatible image view to load image from the given `URL`.
-    /// - Parameters:
-    ///   - source: The image `Source` defining where to load the target image.
-    ///   - isLoaded: Whether the image is loaded or not. This provides a way to inspect the internal loading
-    ///               state. `true` if the image is loaded successfully. Otherwise, `false`. Do not set the
-    ///               wrapped value from outside.
-    public init(_ url: URL?, isLoaded: Binding<Bool> = .constant(false)) {
-        self.init(source: url?.convertToSource(), isLoaded: isLoaded)
     }
 
     init(binder: ImageBinder) {
@@ -118,6 +93,16 @@ public struct KFImage: View {
         if start {
             context.binder.start()
         }
+        return self
+    }
+    
+    public func url(_ url: URL?) -> KFImage {
+        context.binder.source = url?.convertToSource()
+        return self
+    }
+    
+    public func source(_ source: Source?) -> KFImage {
+        context.binder.source = source
         return self
     }
 }
@@ -247,7 +232,7 @@ extension KFImage {
     /// - Parameter block: The block applies to loaded image.
     /// - Returns: A `KFImage` view that configures internal `Image` with `block`.
     public func configure(_ block: @escaping (Image) -> Image) -> KFImage {
-        let result = self
+        var result = self
         result.context.configurations.append(block)
         return result
     }
@@ -277,7 +262,8 @@ extension KFImage {
 struct KFImage_Previews : PreviewProvider {
     static var previews: some View {
         Group {
-            KFImage(source: .network(URL(string: "https://raw.githubusercontent.com/onevcat/Kingfisher/master/images/logo.png")!))
+            KFImage()
+                .source(.network(URL(string: "https://raw.githubusercontent.com/onevcat/Kingfisher/master/images/logo.png")!))
                 .onSuccess { r in
                     print(r)
                 }
