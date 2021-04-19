@@ -35,7 +35,7 @@ extension KFImage {
     /// image downloading and progress reporting based on `KingfisherManager`.
     class ImageBinder: ObservableObject {
 
-        var source: Source? { didSet { if source != oldValue { cancel() }}}
+        let source: Source?
         var options = KingfisherParsedOptionsInfo(KingfisherManager.shared.defaultOptions)
 
         var downloadTask: DownloadTask?

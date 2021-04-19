@@ -42,7 +42,7 @@ extension KFImage {
         _ source: Source?, isLoaded: Binding<Bool> = .constant(false)
     ) -> KFImage
     {
-        KFImage(isLoaded: isLoaded).source(source)
+        KFImage(source: source, isLoaded: isLoaded)
     }
 
     /// Creates a `KFImage` for a given `Resource`.
